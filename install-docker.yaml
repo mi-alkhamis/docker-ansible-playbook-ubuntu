@@ -1,0 +1,143 @@
+
+---
+ - hosts: all
+   
+   vars:
+     default_os_release: "focal"
+     docker_rep_filename: "docker"
+     docker_gpg_url: "https://download.docker.com/linux/ubuntu/gpg"
+     docker_repo_url: "https://download.docker.com/linux/ubuntu"
+     
+   tasks:
+   
+     - name: find docker app
+       shell: "which docker"
+       register: docker_install
+       ignore_errors: yes
+       tags:
+         - all
+         - preinstall
+   
+      
+     - name: check docker installation
+       meta: end_host
+       when: docker_install.rc != 0
+       ignore_errors: yes
+       tags:
+         - all
+         - preinstall
+  
+  
+     - name: update apt cache, upgrade systems
+       apt:
+         update_cache: yes
+         upgrade: full
+         cache_valid_time: 3600
+         state: present
+       register: apt_lock_status
+       retries: 5
+       until: apt_lock_status is success or ('Failed to lock apt for exclusive operation' not in apt_lock_status.msg and '/var/lib/dpkg/lock' not in apt_lock_status.msg)
+       tags:
+         - all
+         - preinstall
+         - update cache 
+  
+        
+     - name: install some prerequisites
+       apt:
+         pkg:
+           - apt-transport-https 
+           - ca-certificates 
+           - curl 
+           - gnupg
+           - lsb-release
+       tags:
+         - all
+         - preinstall   
+         - install-pre 
+                
+     
+     - name: Add Docker GPG
+       apt_key:
+         url: '{{ docker_gpg_url }}'
+         state: present
+       tags:
+         - all
+         - add_gpg
+         - preinstall
+  
+                 
+     - name: specify OS Release
+       shell: "lsb_release -cs"
+       ignore_errors: yes
+       register: os_release
+       tags:
+         - all
+         - preinstall
+         - add_repo
+         - os_release
+  
+      
+     - name: Add Docker repository & update apt cache
+       apt_repository:
+         repo: "deb '{{ docker_repo_url }}' '{{ os_release.stdout | default ( '{{ default_os_release }}' ) }}' stable "
+         state: present
+         update_cache: yes
+         filename: '{{ docker_rep_filename }}'
+       tags:
+         - all
+         - preinstall
+         - add_repo
+         
+                 
+     - name: install docker
+       apt:
+         pkg:
+           -  docker-ce 
+           -  docker-ce-cli 
+           -  containerd.io
+       tags:
+         - all
+         - install
+    
+        
+     - name: Check docker version
+       shell: "docker --version"
+       ignore_errors: yes
+       register: docker_ver
+       tags: 
+         - all
+         - install
+         - info
+         - check_ver
+    
+    
+     - name: show Docker version
+       debug:
+         msg: "{{ docker_ver.stdout }} installed on  {{ ansible_facts.hostname}}, IP = {{ansible_facts.all_ipv4_addresses[0] }} "
+       tags:
+         - all
+         - install
+         - info
+         - check_ver
+    
+     
+     - name: Check Docker Service
+       shell: "systemctl status docker.service"
+       register: service_status
+       ignore_errors: yes
+       tags:
+         - all
+         - install
+         - info
+         - check_service
+    
+    
+     - name: show docker service status
+       debug:
+         msg: "Service info:{{ service_status.stdout_lines[2] }}"
+       tags:
+         - all
+         - install
+         - info
+         - check_service
