@@ -1,5 +1,12 @@
 # ansible-docker - Ansible Playbook for Docker
 
+[![GitHub](https://img.shields.io/badge/dws-ops--002--ansible-brightgreen?style=plastic)](https://github.com/mi-alkhamis/docker-ansible)
+[![GitHub forks](https://img.shields.io/github/forks/mi-alkhamis/docker-ansible?style=plastic)](https://github.com/mi-alkhamis/docker-ansible/network)
+[![GitHub issues](https://img.shields.io/github/issues/mi-alkhamis/docker-ansible?color=orange&style=plastic)](https://github.com/mi-alkhamis/docker-ansible/issues) 
+[![GitHub license](https://img.shields.io/github/license/mi-alkhamis/docker-ansible?style=plastic)](https://github.com/mi-alkhamis/docker-ansible/blob/main/LICENSE)
+
+![Header](https://i.morioh.com/210401/0198a4ba.webp)
+
 ## Overview
 
 If you are looking for a playbook to automate install docker for you, this playbook preapared based on [docker.io](https://docs.docker.com/engine/install/ubuntu/) for ubuntu (or ubuntu based distro only )
@@ -59,4 +66,4 @@ All contributions are welcome:
 ## License
 
 This project is licensed under the Apache-2.0 License  - see the [LICENSE](https://github.com/mi-alkhamis/docker-ansible/blob/main/LICENSE) file for details.
-
+@dwsclass dws-ops-002-ansible
